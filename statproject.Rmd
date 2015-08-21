@@ -5,7 +5,7 @@ date: "August 11, 2015"
 output: 
   pdf_document: 
     keep_tex: yes
----
+--- 
 ```{r, echo=FALSE}
 setwd("~/CourseraRClass/Regression")
 
@@ -29,17 +29,15 @@ lmp <- function(modelobject) {
 
 ```
 
-
-
 #Executive Summary
-The purpose of this paper is to explore the relationship between a set of variables and miles per gallon(mpg) as part of a class project using the mtcars dataset.  It will focus on answering two questions: "Is an automatic or manual transmission better for MPG" and "Quantify the MPG difference between automatic and manual transmissions".  Based on the analysis below there is a relationsip between MPG and transmission type.
+The purpose of this paper is to explore the relationship between a set of variables and miles per gallon(mpg) as part of a class project using the mtcars dataset.  It will focus on answering two questions: "Is an automatic or manual transmission better for MPG?" and "Quantify the MPG difference between automatic and manual transmissions".  Based on the analysis below there is a relationsip between MPG and transmission type.
 
 #Data Analysis
 
 ##EDA
 First we'll start by exploring relationships in the data.  We'll do this by creating a correlation matrix and pairwise plots of all of the variabes. (See appendix).  Interestingly enough all the variables seem to have strong correlations with mpg.  It's also noted that we will need to convert several of the variables from numeric to factor variables prior to feeding into a regression model.
 
-From there we will work to build a regression model to determine determine how Transmission (0 = automatic, 1 = manual) relates to MPG.  
+From here we'll work to build a regression model to determine determine how Transmission (0 = automatic, 1 = manual) relates to MPG.  
 ```{r , echo=FALSE}
 regdata<-mtcars
 
@@ -49,44 +47,40 @@ regdata$am   <-as.factor(mtcars$am)
 regdata$gear <-as.factor(mtcars$gear)
 regdata$carb <-as.factor(mtcars$carb)
 ```
-##Variable Selection and model building
-To get started with variable selection we start with a simple model of transmission vs. mpg.
+##Variable Selection and Model Building
+To get started with variable selection we execute a simple model of transmission, am, vs. mpg. (See the Appendix for the model summary)
 ```{r}
 fit1 <- lm(mpg~am,data=regdata)
 ```
-The model is significant with a p-value of `r lmp(fit1)`.  However, given the lower R-squared `r summary(fit1)$adj.r.squared` we'll work to include more predictors to get a better explaination of the variable in mpg. To do this we'll run a stepwise regression and compare the models.
+The model is significant with a p-value of `r lmp(fit1)`.  However, given the lower R-squared `r summary(fit1)$adj.r.squared` we'll work to include more predictors to get a better explaination of the variation in mpg. To do this we'll run a stepwise regression and compare the models.  (See the Appendix for the model summary) 
 ```{r results="hide"}
 fit2 <- lm(mpg~cyl+disp+hp+drat+wt+qsec+vs+am+gear+carb,data=regdata)
 stepModel <- step(fit2, k=log(nrow(regdata)))
 ```
-From the stepwise regression, we find a signifcant model with a pvalue of `r lmp(stepModel)` and a much better R-squared, `r summary(stepModel)$adj.r.squared`.
-
-Comparing the two models using the anova function we also verify that adding in wt and qsec
-is <clean up wording....need more> than just am.
+From the stepwise regression, we find a signifcant model with a pvalue of `r lmp(stepModel)` and a much better R-squared, `r summary(stepModel)$adj.r.squared`.  Comparing the two models using the anova function, we can see that it is benefical to add in wt and qsec as we obtain a signifcant pvalue from the anova. (see below)
 ```{r}
 anova(fit1,stepModel)
 ```
-
+###Diagnostic Plots
 With a model selected lets do some quick diagnostic plots.
 ```{r}
 par(mfrow=c(2,2))
 plot(stepModel)
-
-
 ```
+Looking at the plot of the fit values vs. the residuals, there does not seem to be any strong heteroskedasticity and the errors center around zero.  One might argue there is some curve to the errors so additional variables might be helpful but its difficult to tell with a smaller sample.  The Normal Q-Q plot also doesn't show any strong depatures from normality.  The Scale Location and Residuals vs. Leverage don't show any outliers.
 
-Looking at the plot of the fit values vs. the residuals, there does not seem to be any heteroskedasticity and the errors center around zero.  The Normal Q-Q plot also doesn't show any strong depatures from normality.  The Scale Location and Residuals vs. Leverage
-
-Lastly, to answer the given questions, we can execute a T-test on the transition parameter,am, from the model.  From this we can find that the paramater is moderately signifcant, `r summary(stepModel)$coefficients[4,4]`.  Thus, a manual transmission provides `r summary(stepModel)$coefficients[4,1]` more miles per gallon keeping in mind there is a lot variation around the estimate.  The 95% CI for the interval is [`r confint(stepModel, level=0.95)[4,1]`,`r confint(stepModel, level=0.95)[4,2]`]. 
-
-
-
-
-
-
+###Conclusion
+Lastly, to answer the given questions, we can execute a T-test on the transmission parameter,am, from the stepwise model.  From this we can find that the paramater is moderately signifcant with a Pvalue of, `r summary(stepModel)$coefficients[4,4]`.  Thus, a manual transmission provides `r summary(stepModel)$coefficients[4,1]` more miles per gallon keeping in mind there is a lot variation around the estimate.  The 95% CI for the interval is [`r confint(stepModel, level=0.95)[4,1]`,`r confint(stepModel, level=0.95)[4,2]`]. 
 
 #Appendix
-Plots
+
+##Model Summary
+```{r}
+summary(fit1)
+summary(stepModel)
+```
+
+##EDA & Plots
 ```{r}
 head(mtcars)
 str(mtcars)

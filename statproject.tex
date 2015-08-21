@@ -115,9 +115,10 @@
 The purpose of this paper is to explore the relationship between a set
 of variables and miles per gallon(mpg) as part of a class project using
 the mtcars dataset. It will focus on answering two questions: ``Is an
-automatic or manual transmission better for MPG'' and ``Quantify the MPG
-difference between automatic and manual transmissions''. Based on the
-analysis below there is a relationsip between MPG and transmission type.
+automatic or manual transmission better for MPG?'' and ``Quantify the
+MPG difference between automatic and manual transmissions''. Based on
+the analysis below there is a relationsip between MPG and transmission
+type.
 
 \section{Data Analysis}\label{data-analysis}
 
@@ -130,14 +131,14 @@ have strong correlations with mpg. It's also noted that we will need to
 convert several of the variables from numeric to factor variables prior
 to feeding into a regression model.
 
-From there we will work to build a regression model to determine
-determine how Transmission (0 = automatic, 1 = manual) relates to MPG.
+From here we'll work to build a regression model to determine determine
+how Transmission (0 = automatic, 1 = manual) relates to MPG.
 
-\subsection{Variable Selection and model
-building}\label{variable-selection-and-model-building}
+\subsection{Variable Selection and Model
+Building}\label{variable-selection-and-model-building}
 
-To get started with variable selection we start with a simple model of
-transmission vs.~mpg.
+To get started with variable selection we execute a simple model of
+transmission, am, vs.~mpg. (See the Appendix for the model summary)
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -147,8 +148,9 @@ transmission vs.~mpg.
 
 The model is significant with a p-value of 0.000285020744. However,
 given the lower R-squared 0.33846 we'll work to include more predictors
-to get a better explaination of the variable in mpg. To do this we'll
-run a stepwise regression and compare the models.
+to get a better explaination of the variation in mpg. To do this we'll
+run a stepwise regression and compare the models. (See the Appendix for
+the model summary)
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -158,10 +160,10 @@ run a stepwise regression and compare the models.
 \end{Shaded}
 
 From the stepwise regression, we find a signifcant model with a pvalue
-of 1.2e-11 and a much better R-squared, 0.83356.
-
-Comparing the two models using the anova function we also verify that
-adding in wt and qsec is than just am.
+of 1.2e-11 and a much better R-squared, 0.83356. Comparing the two
+models using the anova function, we can see that it is benefical to add
+in wt and qsec as we obtain a signifcant pvalue from the anova. (see
+below)
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -181,6 +183,8 @@ adding in wt and qsec is than just am.
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
 
+\subsubsection{Diagnostic Plots}\label{diagnostic-plots}
+
 With a model selected lets do some quick diagnostic plots.
 
 \begin{Shaded}
@@ -191,22 +195,84 @@ With a model selected lets do some quick diagnostic plots.
 \end{Shaded}
 
 \includegraphics{statproject_files/figure-latex/unnamed-chunk-6-1.pdf}
-
 Looking at the plot of the fit values vs.~the residuals, there does not
-seem to be any heteroskedasticity and the errors center around zero. The
-Normal Q-Q plot also doesn't show any strong depatures from normality.
-The Scale Location and Residuals vs.~Leverage
+seem to be any strong heteroskedasticity and the errors center around
+zero. One might argue there is some curve to the errors so additional
+variables might be helpful but its difficult to tell with a smaller
+sample. The Normal Q-Q plot also doesn't show any strong depatures from
+normality. The Scale Location and Residuals vs.~Leverage don't show any
+outliers.
+
+\subsubsection{Conclusion}\label{conclusion}
 
 Lastly, to answer the given questions, we can execute a T-test on the
-transition parameter,am, from the model. From this we can find that the
-paramater is moderately signifcant, 0.04672. Thus, a manual transmission
-provides 2.93584 more miles per gallon keeping in mind there is a lot
-variation around the estimate. The 95\% CI for the interval is
-{[}0.04573,5.82594{]}.
+transmission parameter,am, from the stepwise model. From this we can
+find that the paramater is moderately signifcant with a Pvalue of,
+0.04672. Thus, a manual transmission provides 2.93584 more miles per
+gallon keeping in mind there is a lot variation around the estimate. The
+95\% CI for the interval is {[}0.04573,5.82594{]}.
 
 \section{Appendix}\label{appendix}
 
-Plots
+\subsection{Model Summary}\label{model-summary}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(fit1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = mpg ~ am, data = regdata)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -9.392 -3.092 -0.297  3.244  9.508 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)    17.15       1.12   15.25  1.1e-15 ***
+## am1             7.24       1.76    4.11  0.00029 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 4.9 on 30 degrees of freedom
+## Multiple R-squared:  0.36,   Adjusted R-squared:  0.338 
+## F-statistic: 16.9 on 1 and 30 DF,  p-value: 0.000285
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(stepModel)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = mpg ~ wt + qsec + am, data = regdata)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -3.481 -1.556 -0.726  1.411  4.661 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)    9.618      6.960    1.38  0.17792    
+## wt            -3.917      0.711   -5.51    7e-06 ***
+## qsec           1.226      0.289    4.25  0.00022 ***
+## am1            2.936      1.411    2.08  0.04672 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.46 on 28 degrees of freedom
+## Multiple R-squared:  0.85,   Adjusted R-squared:  0.834 
+## F-statistic: 52.7 on 3 and 28 DF,  p-value: 1.21e-11
+\end{verbatim}
+
+\subsection{EDA \& Plots}\label{eda-plots}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -284,6 +350,6 @@ Plots
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{statproject_files/figure-latex/unnamed-chunk-7-1.pdf}
+\includegraphics{statproject_files/figure-latex/unnamed-chunk-8-1.pdf}
 
 \end{document}
